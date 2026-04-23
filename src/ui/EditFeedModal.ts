@@ -24,6 +24,7 @@ export class EditFeedModal extends Modal {
 	private customAutoDeleteDays: number;
 	private customAutoDeleteTimeUnit: string;
 	private customAutoDeleteBasedOn: string;
+	private removeSelectors: string;
 
 	constructor(
 		app: App,
@@ -50,6 +51,7 @@ export class EditFeedModal extends Modal {
 		this.customAutoDeleteDays = this.feed.customAutoDeleteDays ?? this.settings.autoDeleteDays;
 		this.customAutoDeleteTimeUnit = this.feed.customAutoDeleteTimeUnit ?? this.settings.autoDeleteTimeUnit;
 		this.customAutoDeleteBasedOn = this.feed.customAutoDeleteBasedOn ?? this.settings.autoDeleteBasedOn;
+		this.removeSelectors = this.feed.removeSelectors ?? '';
 	}
 
 	onOpen() {
@@ -87,6 +89,9 @@ export class EditFeedModal extends Modal {
 
 		// --- カスタム削除設定 ---
 		this.renderAutoDeleteSection(contentEl);
+
+		// --- CSSセレクタ除去設定 ---
+		this.renderRemoveSelectorsSection(contentEl);
 
 		// --- ボタン ---
 		new Setting(contentEl)
@@ -230,6 +235,23 @@ export class EditFeedModal extends Modal {
 				}));
 	}
 
+	private renderRemoveSelectorsSection(containerEl: HTMLElement): void {
+		const selectorsContainer = containerEl.createDiv('local-rss-feed-section');
+
+		new Setting(selectorsContainer)
+			.setName(t('removeSelectors'))
+			.setDesc(t('removeSelectorsDesc'))
+			.addText(text => {
+				text.setValue(this.removeSelectors)
+					.setPlaceholder(t('removeSelectorsPlaceholder'))
+					.onChange((value) => {
+						this.removeSelectors = value;
+					});
+				text.inputEl.addClass('local-rss-modal-selectors-input');
+				return text;
+			});
+	}
+
 	private async handleSave(): Promise<void> {
 		const name = this.nameInput.value.trim();
 		const url = this.urlInput.value.trim();
@@ -257,6 +279,7 @@ export class EditFeedModal extends Modal {
 				customAutoDeleteDays: this.useCustomAutoDelete ? this.customAutoDeleteDays : undefined,
 				customAutoDeleteTimeUnit: this.useCustomAutoDelete ? this.customAutoDeleteTimeUnit : undefined,
 				customAutoDeleteBasedOn: this.useCustomAutoDelete ? this.customAutoDeleteBasedOn : undefined,
+				removeSelectors: this.removeSelectors || undefined,
 			};
 
 			this.settings.feeds[this.feedIndex] = updatedFeed;

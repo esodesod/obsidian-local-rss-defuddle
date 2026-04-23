@@ -44,6 +44,10 @@ export default {
 	fetchArticleContent: 'Récupérer le contenu de l\'article',
 	fetchArticleContentDesc:
 		'Récupérer le HTML complet de l\'article depuis le lien et le parser via defuddle pour {{content}} (peut prendre plus de temps)',
+	removeSelectors: 'Supprimer des éléments par sélecteur CSS',
+	removeSelectorsDesc:
+		'Sélecteurs CSS séparés par des virgules à supprimer du HTML de l\'article avant le parsing (ex: .lp_related,.authors,.ad-banner)',
+	removeSelectorsPlaceholder: '.ads,.sidebar,.related',
 	imageWidth: 'Largeur des images',
 	imageWidthDesc: 'Largeur des images dans le contenu (ex: 50%, 300px)',
 	autoDeleteOldArticles: 'Supprimer automatiquement les anciens articles',

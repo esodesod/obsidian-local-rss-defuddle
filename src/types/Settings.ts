@@ -9,6 +9,8 @@ export interface Feed {
 	customAutoDeleteDays?: number;
 	customAutoDeleteTimeUnit?: string;
 	customAutoDeleteBasedOn?: string;
+	// CSS selectors to remove from fetched article HTML before defuddle parsing (comma-separated)
+	removeSelectors?: string;
 }
 
 export interface ResolvedFeedSettings {
@@ -17,6 +19,7 @@ export interface ResolvedFeedSettings {
 	autoDeleteDays: number;
 	autoDeleteTimeUnit: string;
 	autoDeleteBasedOn: string;
+	removeSelectors: string;
 }
 
 export interface DownloadHistoryEntry {

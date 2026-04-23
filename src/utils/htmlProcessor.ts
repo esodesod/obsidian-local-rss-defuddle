@@ -95,3 +95,36 @@ export function extractFirstImage(html: string): string | undefined {
 	const firstImg = doc.querySelector('img');
 	return firstImg?.getAttribute('src') || undefined;
 }
+
+/**
+ * CSSセレクタに一致する要素をHTMLから除去
+ * @param html HTMLコンテンツ
+ * @param selectors 除去するCSSセレクタ（カンマ区切り）
+ * @returns 処理されたHTML
+ */
+export function removeElementsBySelectors(html: string, selectors: string): string {
+	if (!html || !selectors) return html;
+
+	if (typeof html !== 'string') {
+		console.error('removeElementsBySelectors: received non-string input', html);
+		return '';
+	}
+
+	try {
+		const wrappedHtml = `<html><body>${html}</body></html>`;
+		const { document } = parseHTML(wrappedHtml);
+
+		// 半角/全角カンマでセレクタを分割し、空白をトリム
+		const selectorList = selectors.split(/[,，]/).map(s => s.trim()).filter(Boolean);
+
+		for (const selector of selectorList) {
+			const elements = document.querySelectorAll(selector);
+			elements.forEach(el => el.remove());
+		}
+
+		return document.body.innerHTML;
+	} catch (error) {
+		console.error('removeElementsBySelectors: failed', error);
+		return html;
+	}
+}

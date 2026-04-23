@@ -11,11 +11,13 @@ export class FeedSettingsResolver {
 			autoDeleteDays: feed.customAutoDeleteDays ?? globalSettings.autoDeleteDays,
 			autoDeleteTimeUnit: feed.customAutoDeleteTimeUnit ?? globalSettings.autoDeleteTimeUnit,
 			autoDeleteBasedOn: feed.customAutoDeleteBasedOn ?? globalSettings.autoDeleteBasedOn,
+			removeSelectors: feed.removeSelectors ?? '',
 		};
 	}
 
 	static hasCustomSettings(feed: Feed): boolean {
 		return feed.customTemplate !== undefined
-			|| feed.customAutoDeleteEnabled !== undefined;
+			|| feed.customAutoDeleteEnabled !== undefined
+			|| feed.removeSelectors !== undefined;
 	}
 }

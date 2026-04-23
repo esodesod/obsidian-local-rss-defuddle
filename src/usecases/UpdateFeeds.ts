@@ -10,6 +10,7 @@ import { ArticleRenderer } from '../services/ArticleRenderer';
 import { FeedSettingsResolver } from '../services/FeedSettingsResolver';
 import { t } from '../adapters/i18n/localization';
 import { normalizePath, sanitizeHTMLToDom } from 'obsidian';
+import { removeElementsBySelectors } from '../utils/htmlProcessor';
 
 /**
  * フィード更新ユースケース
@@ -88,7 +89,7 @@ export class UpdateFeeds {
 				for (const item of items) {
 					const rssItem = this.rssItemBuilder.fromAtomItem(item, atomFeed, feed);
 					await this.enrichWithImage(rssItem, item);
-					await this.saveRssItem(rssItem, feedFolderPath, resolved.template);
+					await this.saveRssItem(rssItem, feedFolderPath, resolved);
 				}
 			} else {
 				new Notice(t('unsupportedFeedFormat', feed.name));
@@ -99,7 +100,7 @@ export class UpdateFeeds {
 			for (const item of items) {
 				const rssItem = this.rssItemBuilder.fromRssItem(item, feed);
 				await this.enrichWithImage(rssItem, item);
-				await this.saveRssItem(rssItem, feedFolderPath, resolved.template);
+				await this.saveRssItem(rssItem, feedFolderPath, resolved);
 			}
 		}
 
@@ -191,7 +192,7 @@ export class UpdateFeeds {
 	/**
 	 * RSSアイテムをMarkdownファイルとして保存
 	 */
-	private async saveRssItem(rssItem: RssItem, folderPath: string, template: string): Promise<void> {
+	private async saveRssItem(rssItem: RssItem, folderPath: string, resolved: ResolvedFeedSettings): Promise<void> {
 		// 履歴ベースの重複チェック
 		if (rssItem.link && this.articleHistory.hasBeenDownloaded(rssItem.link)) {
 			return;
@@ -218,11 +219,16 @@ export class UpdateFeeds {
 			}
 		}
 
+		// フィード個別のCSSセレクタで不要な要素を除去
+		if (resolved.removeSelectors && processedContent) {
+			processedContent = removeElementsBySelectors(processedContent, resolved.removeSelectors);
+		}
+
 		if (this.settings.imageWidth && this.settings.imageWidth !== '100%') {
 			processedContent = this.resizeImagesInContent(processedContent);
 		}
 
-		const fileContent = await this.articleRenderer.render(rssItem, template, processedContent);
+		const fileContent = await this.articleRenderer.render(rssItem, resolved.template, processedContent);
 		await this.vault.create(fileName, fileContent);
 
 		if (rssItem.link) {
