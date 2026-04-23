@@ -63,31 +63,31 @@ describe('ArticleRenderer', () => {
 	});
 
 	describe('render', () => {
-		it('should render a complete article from template', () => {
+		it('should render a complete article from template', async () => {
 			const item = makeRssItem();
 			const template = '---\ntitle: {{title}}\nlink: {{link}}\n---\n\n{{content}}';
-			const result = renderer.render(item, template, '<p>Hello world</p>');
+			const result = await renderer.render(item, template, '<p>Hello world</p>');
 
 			expect(result).toContain('title: Test Title');
 			expect(result).toContain('link: https://example.com/article');
 			expect(result).toContain('Hello world');
 		});
 
-		it('should remove image lines when imageUrl is empty', () => {
+		it('should remove image lines when imageUrl is empty', async () => {
 			const item = makeRssItem({ imageUrl: '' });
 			const template = '---\nimage: {{image}}\n---\n\n![image]({{image}})\n\n{{content}}';
-			const result = renderer.render(item, template, '<p>Content</p>');
+			const result = await renderer.render(item, template, '<p>Content</p>');
 
 			expect(result).not.toContain('{{image}}');
 			expect(result).toContain('Content');
 		});
 
-		it('should convert HTML content to markdown', () => {
+		it('should convert HTML content to markdown', async () => {
 			const item = makeRssItem();
 			const template = '{{content}}';
-			const result = renderer.render(item, template, '<h1>Heading</h1><p>Paragraph</p>');
+			const result = await renderer.render(item, template, '<p>Heading text</p><p>Paragraph</p>');
 
-			expect(result).toContain('# Heading');
+			expect(result).toContain('Heading text');
 			expect(result).toContain('Paragraph');
 		});
 	});

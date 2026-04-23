@@ -40,6 +40,8 @@ const ja: Partial<typeof en> = {
 	includeImagesDesc: 'フィード記事から画像URLを含める',
 	fetchImageFromLink: 'リンク先から画像を取得',
 	fetchImageFromLinkDesc: 'RSSフィードに画像がない場合、記事のリンク先からOGP画像を取得します（処理に時間がかかります）',
+	fetchArticleContent: '記事コンテンツを取得',
+	fetchArticleContentDesc: '記事のリンク先から完全なHTMLを取得し、defuddleで解析して{{content}}に格納します（処理に時間がかかります）',
 	imageWidth: '画像の幅',
 	imageWidthDesc: 'コンテンツ内の画像の幅（例：50%、300px）',
 	autoDeleteOldArticles: '古い記事を自動削除',

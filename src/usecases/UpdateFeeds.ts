@@ -209,12 +209,20 @@ export class UpdateFeeds {
 			return;
 		}
 
+		// 設定が有効の場合は記事ページからHTMLを取得
 		let processedContent = rssItem.content;
+		if (this.settings.fetchArticleContent && rssItem.link) {
+			const fetchedHtml = await this.feedFetcher.fetchHtml(rssItem.link);
+			if (fetchedHtml) {
+				processedContent = fetchedHtml;
+			}
+		}
+
 		if (this.settings.imageWidth && this.settings.imageWidth !== '100%') {
 			processedContent = this.resizeImagesInContent(processedContent);
 		}
 
-		const fileContent = this.articleRenderer.render(rssItem, template, processedContent);
+		const fileContent = await this.articleRenderer.render(rssItem, template, processedContent);
 		await this.vault.create(fileName, fileContent);
 
 		if (rssItem.link) {

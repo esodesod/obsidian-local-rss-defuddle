@@ -50,10 +50,10 @@ export class ArticleRenderer {
 	 * @param processedContent 処理済みのHTMLコンテンツ
 	 * @returns Markdownファイルの内容
 	 */
-	render(rssItem: RssItem, template: string, processedContent: string): string {
+	async render(rssItem: RssItem, template: string, processedContent: string): Promise<string> {
 		const preparedTemplate = prepareTemplate(template, rssItem);
 		const templateData = this.buildTemplateData(rssItem);
-		templateData.content = htmlToMarkdown(processedContent);
+		templateData.content = await htmlToMarkdown(processedContent);
 		return renderTemplate(preparedTemplate, templateData);
 	}
 }

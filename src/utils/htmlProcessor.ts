@@ -1,20 +1,6 @@
-import TurndownService from 'turndown';
 import sanitizeHtml from 'sanitize-html';
-
-/**
- * HTML → Markdown変換用の設定
- */
-const turndownService = new TurndownService({
-	headingStyle: 'atx',
-	codeBlockStyle: 'fenced',
-	bulletListMarker: '-',
-});
-
-// 不要なタグを除去するルール追加
-turndownService.addRule('removeScripts', {
-	filter: ['script', 'style'],
-	replacement: () => ''
-});
+import { Defuddle } from 'defuddle/node';
+import { parseHTML } from 'linkedom';
 
 /**
  * HTMLタグを除去してプレーンテキスト化
@@ -47,11 +33,11 @@ export function stripHtml(html: string, maxLength?: number): string {
 }
 
 /**
- * HTML → Markdown変換
+ * HTML → Markdown変換（defuddle使用）
  * @param html HTMLコンテンツ
  * @returns Markdownコンテンツ
  */
-export function htmlToMarkdown(html: string): string {
+export async function htmlToMarkdown(html: string): Promise<string> {
 	if (!html) return '';
 
 	// 文字列でない場合は空文字列を返す（xml2jsがオブジェクトを返す場合の対策）
@@ -60,10 +46,22 @@ export function htmlToMarkdown(html: string): string {
 		return '';
 	}
 
-	// scriptタグなどを事前に除去
-	const cleanHtml = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-
-	return turndownService.turndown(cleanHtml);
+	try {
+		// RSSコンテンツはすでに抽出済みなので、最小限のdocument構造でラップしてdefuddleに渡す
+		const wrappedHtml = `<html><body><article>${html}</article></body></html>`;
+		const { document } = parseHTML(wrappedHtml);
+		const result = await Defuddle(document, '', {
+			markdown: true,
+			useAsync: false,
+			standardize: false,
+			removeLowScoring: false,
+			removeContentPatterns: false,
+		});
+		return result.content || '';
+	} catch (error) {
+		console.error('htmlToMarkdown: defuddle parsing failed', error);
+		return '';
+	}
 }
 
 /**

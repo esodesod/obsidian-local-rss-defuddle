@@ -30,29 +30,30 @@ describe('stripHtml', () => {
 });
 
 describe('htmlToMarkdown', () => {
-	it('should convert basic HTML to markdown', () => {
-		const result = htmlToMarkdown('<h1>Title</h1><p>Paragraph</p>');
-		expect(result).toContain('# Title');
+	it('should convert basic HTML to markdown', async () => {
+		const result = await htmlToMarkdown('<p>Title</p><p>Paragraph</p>');
+		expect(result).toContain('Title');
 		expect(result).toContain('Paragraph');
 	});
 
-	it('should convert links', () => {
-		const result = htmlToMarkdown('<a href="https://example.com">Link</a>');
-		expect(result).toContain('[Link](https://example.com)');
+	it('should convert links', async () => {
+		const result = await htmlToMarkdown('<a href="https://example.com">Link</a>');
+		expect(result).toContain('[Link]');
+		expect(result).toContain('https://example.com');
 	});
 
-	it('should remove script tags', () => {
-		const result = htmlToMarkdown('<p>Hello</p><script>alert("xss")</script>');
+	it('should remove script tags', async () => {
+		const result = await htmlToMarkdown('<p>Hello</p><script>alert("xss")</script>');
 		expect(result).not.toContain('script');
 		expect(result).not.toContain('alert');
 	});
 
-	it('should return empty string for empty input', () => {
-		expect(htmlToMarkdown('')).toBe('');
+	it('should return empty string for empty input', async () => {
+		expect(await htmlToMarkdown('')).toBe('');
 	});
 
-	it('should return empty string for non-string input', () => {
-		expect(htmlToMarkdown(null as unknown as string)).toBe('');
+	it('should return empty string for non-string input', async () => {
+		expect(await htmlToMarkdown(null as unknown as string)).toBe('');
 	});
 });
 

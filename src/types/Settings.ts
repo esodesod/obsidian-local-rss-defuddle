@@ -33,6 +33,7 @@ export interface LocalRssSettings {
 	lastUpdateTime: number;
 	includeImages: boolean;
 	fetchImageFromLink: boolean;
+	fetchArticleContent: boolean;
 	dateFormat: string;
 	imageWidth: string;
 	autoDeleteEnabled: boolean;
@@ -51,6 +52,7 @@ export const DEFAULT_SETTINGS: LocalRssSettings = {
 	lastUpdateTime: 0,
 	includeImages: true,
 	fetchImageFromLink: false,
+	fetchArticleContent: true,
 	dateFormat: 'YYYY-MM-DD HH:mm:ss',
 	imageWidth: '50%',
 	autoDeleteEnabled: false,

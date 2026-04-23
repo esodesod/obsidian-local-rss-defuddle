@@ -41,6 +41,9 @@ export default {
 	fetchImageFromLink: 'Récupérer l\'image depuis le lien',
 	fetchImageFromLinkDesc:
 		'Si le flux RSS n\'a pas d\'image, récupérer l\'image OGP depuis le lien de l\'article (peut prendre plus de temps)',
+	fetchArticleContent: 'Récupérer le contenu de l\'article',
+	fetchArticleContentDesc:
+		'Récupérer le HTML complet de l\'article depuis le lien et le parser via defuddle pour {{content}} (peut prendre plus de temps)',
 	imageWidth: 'Largeur des images',
 	imageWidthDesc: 'Largeur des images dans le contenu (ex: 50%, 300px)',
 	autoDeleteOldArticles: 'Supprimer automatiquement les anciens articles',

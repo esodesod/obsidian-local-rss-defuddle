@@ -38,6 +38,8 @@ export default {
 	includeImagesDesc: 'Include image URLs from feed articles',
 	fetchImageFromLink: 'Fetch image from link',
 	fetchImageFromLinkDesc: 'If RSS feed has no image, fetch OGP image from article link (may take longer)',
+	fetchArticleContent: 'Fetch article content',
+	fetchArticleContentDesc: 'Fetch full article HTML from link and parse via defuddle for {{content}} (may take longer)',
 	imageWidth: 'Image width',
 	imageWidthDesc: 'Width of images in content (e.g. 50%, 300px)',
 	autoDeleteOldArticles: 'Auto-delete old articles',

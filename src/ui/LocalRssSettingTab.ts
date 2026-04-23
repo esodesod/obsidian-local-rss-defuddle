@@ -134,6 +134,16 @@ export class LocalRssSettingTab extends PluginSettingTab {
 				}));
 
 		new Setting(containerEl)
+			.setName(t('fetchArticleContent'))
+			.setDesc(t('fetchArticleContentDesc'))
+			.addToggle(toggle => toggle
+				.setValue(this.settings.fetchArticleContent)
+				.onChange(async (value) => {
+					this.settings.fetchArticleContent = value;
+					await this.onSaveSettings();
+				}));
+
+		new Setting(containerEl)
 			.setName(t('imageWidth'))
 			.setDesc(t('imageWidthDesc'))
 			.addText(text => text
