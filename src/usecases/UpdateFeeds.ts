@@ -10,7 +10,7 @@ import { ArticleRenderer } from '../services/ArticleRenderer';
 import { FeedSettingsResolver } from '../services/FeedSettingsResolver';
 import { t } from '../adapters/i18n/localization';
 import { normalizePath, sanitizeHTMLToDom } from 'obsidian';
-import { removeElementsBySelectors } from '../utils/htmlProcessor';
+import { removeElementsBySelectors, keepElementsBySelectors } from '../utils/htmlProcessor';
 
 /**
  * フィード更新ユースケース
@@ -224,12 +224,17 @@ export class UpdateFeeds {
 			processedContent = removeElementsBySelectors(processedContent, resolved.removeSelectors);
 		}
 
+		// ターゲットセレクタで保持する要素を抽出（複数セレクタ対応）
+		if (resolved.targetSelectors && processedContent) {
+			processedContent = keepElementsBySelectors(processedContent, resolved.targetSelectors);
+		}
+
 		if (this.settings.imageWidth && this.settings.imageWidth !== '100%') {
 			processedContent = this.resizeImagesInContent(processedContent);
 		}
 
-		// targetSelectorsはdefuddleのcontentSelectorとして渡す（自動検出をバイパス）
-		const fileContent = await this.articleRenderer.render(rssItem, resolved.template, processedContent, resolved.targetSelectors || undefined);
+		// targetSelectorsはpre-filterで処理済みなのでdefuddleには渡さない
+		const fileContent = await this.articleRenderer.render(rssItem, resolved.template, processedContent);
 		await this.vault.create(fileName, fileContent);
 
 		if (rssItem.link) {

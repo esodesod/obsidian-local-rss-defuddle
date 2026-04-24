@@ -183,16 +183,11 @@ export function keepElementsBySelectors(html: string, selectors: string): string
 
 		if (rootKept.length === 0) return html;
 
-		// body の子要素のうち、保持リストに含まれないものを削除（インプレース）
-		const bodyChildren = Array.from(document.body.children);
-		for (const child of bodyChildren) {
-			const isKept = rootKept.some(kept => kept === child || kept.contains(child));
-			if (!isKept) {
-				child.remove();
-			}
-		}
+		// 保持要素を新しい body に移動（祖先コンテナは含めない）
+		const newBody = document.createElement('body');
+		rootKept.forEach(el => newBody.appendChild(el));
 
-		return document.body.innerHTML;
+		return newBody.innerHTML;
 	} catch (error) {
 		console.error('keepElementsBySelectors: failed', error);
 		return html;
