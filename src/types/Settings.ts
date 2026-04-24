@@ -11,6 +11,8 @@ export interface Feed {
 	customAutoDeleteBasedOn?: string;
 	// CSS selectors to remove from fetched article HTML before defuddle parsing (comma-separated)
 	removeSelectors?: string;
+	// CSS selectors to target/include from fetched article HTML before processing (comma-separated)
+	targetSelectors?: string;
 }
 
 export interface ResolvedFeedSettings {
@@ -20,6 +22,7 @@ export interface ResolvedFeedSettings {
 	autoDeleteTimeUnit: string;
 	autoDeleteBasedOn: string;
 	removeSelectors: string;
+	targetSelectors: string;
 }
 
 export interface DownloadHistoryEntry {
@@ -44,6 +47,7 @@ export interface LocalRssSettings {
 	autoDeleteTimeUnit: string;
 	autoDeleteBasedOn: string;
 	downloadHistory: DownloadHistoryEntry[];
+	targetSelectors: string;
 }
 
 export const DEFAULT_SETTINGS: LocalRssSettings = {
@@ -62,5 +66,6 @@ export const DEFAULT_SETTINGS: LocalRssSettings = {
 	autoDeleteDays: 30,
 	autoDeleteTimeUnit: 'days',
 	autoDeleteBasedOn: 'saved',
-	downloadHistory: []
+	downloadHistory: [],
+	targetSelectors: ''
 };

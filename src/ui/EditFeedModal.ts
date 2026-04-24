@@ -25,6 +25,7 @@ export class EditFeedModal extends Modal {
 	private customAutoDeleteTimeUnit: string;
 	private customAutoDeleteBasedOn: string;
 	private removeSelectors: string;
+	private targetSelectors: string;
 
 	constructor(
 		app: App,
@@ -52,6 +53,7 @@ export class EditFeedModal extends Modal {
 		this.customAutoDeleteTimeUnit = this.feed.customAutoDeleteTimeUnit ?? this.settings.autoDeleteTimeUnit;
 		this.customAutoDeleteBasedOn = this.feed.customAutoDeleteBasedOn ?? this.settings.autoDeleteBasedOn;
 		this.removeSelectors = this.feed.removeSelectors ?? '';
+		this.targetSelectors = this.feed.targetSelectors ?? this.settings.targetSelectors ?? '';
 	}
 
 	onOpen() {
@@ -92,6 +94,9 @@ export class EditFeedModal extends Modal {
 
 		// --- CSSセレクタ除去設定 ---
 		this.renderRemoveSelectorsSection(contentEl);
+
+		// --- CSSセレクタ抽出設定 ---
+		this.renderTargetSelectorsSection(contentEl);
 
 		// --- ボタン ---
 		new Setting(contentEl)
@@ -252,6 +257,23 @@ export class EditFeedModal extends Modal {
 			});
 	}
 
+	private renderTargetSelectorsSection(containerEl: HTMLElement): void {
+		const selectorsContainer = containerEl.createDiv('local-rss-feed-section');
+
+		new Setting(selectorsContainer)
+			.setName(t('targetSelectors'))
+			.setDesc(t('targetSelectorsDesc'))
+			.addText(text => {
+				text.setValue(this.targetSelectors)
+					.setPlaceholder(t('targetSelectorsPlaceholder'))
+					.onChange((value) => {
+						this.targetSelectors = value;
+					});
+				text.inputEl.addClass('local-rss-modal-selectors-input');
+				return text;
+			});
+	}
+
 	private async handleSave(): Promise<void> {
 		const name = this.nameInput.value.trim();
 		const url = this.urlInput.value.trim();
@@ -280,6 +302,7 @@ export class EditFeedModal extends Modal {
 				customAutoDeleteTimeUnit: this.useCustomAutoDelete ? this.customAutoDeleteTimeUnit : undefined,
 				customAutoDeleteBasedOn: this.useCustomAutoDelete ? this.customAutoDeleteBasedOn : undefined,
 				removeSelectors: this.removeSelectors || undefined,
+				targetSelectors: this.targetSelectors || undefined,
 			};
 
 			this.settings.feeds[this.feedIndex] = updatedFeed;

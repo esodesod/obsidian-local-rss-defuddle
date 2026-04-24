@@ -228,7 +228,8 @@ export class UpdateFeeds {
 			processedContent = this.resizeImagesInContent(processedContent);
 		}
 
-		const fileContent = await this.articleRenderer.render(rssItem, resolved.template, processedContent);
+		// targetSelectorsはdefuddleのcontentSelectorとして渡す（自動検出をバイパス）
+		const fileContent = await this.articleRenderer.render(rssItem, resolved.template, processedContent, resolved.targetSelectors || undefined);
 		await this.vault.create(fileName, fileContent);
 
 		if (rssItem.link) {

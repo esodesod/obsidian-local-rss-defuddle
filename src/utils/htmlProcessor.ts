@@ -35,9 +35,10 @@ export function stripHtml(html: string, maxLength?: number): string {
 /**
  * HTML → Markdown変換（defuddle使用）
  * @param html HTMLコンテンツ
+ * @param contentSelector defuddleに渡すCSSセレクタ（自動検出をバイパス）
  * @returns Markdownコンテンツ
  */
-export async function htmlToMarkdown(html: string): Promise<string> {
+export async function htmlToMarkdown(html: string, contentSelector?: string): Promise<string> {
 	if (!html) return '';
 
 	// 文字列でない場合は空文字列を返す（xml2jsがオブジェクトを返す場合の対策）
@@ -47,15 +48,21 @@ export async function htmlToMarkdown(html: string): Promise<string> {
 	}
 
 	try {
-		// RSSコンテンツはすでに抽出済みなので、最小限のdocument構造でラップしてdefuddleに渡す
-		const wrappedHtml = `<html><body><article>${html}</article></body></html>`;
-		const { document } = parseHTML(wrappedHtml);
-		const result = await Defuddle(document, '', {
+		// linkedomでパース後、bodyのコンテンツのみを抽出
+		// これにより完全なHTML文書でもフラグメントでも同じ処理にできる
+		const { document } = parseHTML(html);
+		const bodyContent = document.body?.innerHTML || html;
+
+		// 最小限の構造で再ラップしてdefuddleに渡す
+		const wrappedHtml = `<html><body>${bodyContent}</body></html>`;
+		const { document: cleanDoc } = parseHTML(wrappedHtml);
+		const result = await Defuddle(cleanDoc, '', {
 			markdown: true,
 			useAsync: false,
 			standardize: false,
 			removeLowScoring: false,
 			removeContentPatterns: false,
+			contentSelector: contentSelector || undefined,
 		});
 		return result.content || '';
 	} catch (error) {
@@ -125,6 +132,69 @@ export function removeElementsBySelectors(html: string, selectors: string): stri
 		return document.body.innerHTML;
 	} catch (error) {
 		console.error('removeElementsBySelectors: failed', error);
+		return html;
+	}
+}
+
+/**
+ * CSSセレクタに一致する要素のみをHTMLから抽出（それ以外を除去）
+ * @param html HTMLコンテンツ
+ * @param selectors 保持するCSSセレクタ（カンマ区切り）
+ * @returns 処理されたHTML
+ */
+export function keepElementsBySelectors(html: string, selectors: string): string {
+	if (!html || !selectors) return html;
+
+	if (typeof html !== 'string') {
+		console.error('keepElementsBySelectors: received non-string input', html);
+		return '';
+	}
+
+	try {
+		const wrappedHtml = `<html><body>${html}</body></html>`;
+		const { document } = parseHTML(wrappedHtml);
+
+		// 半角/全角カンマでセレクタを分割し、空白をトリム
+		const selectorList = selectors.split(/[,，]/).map(s => s.trim()).filter(Boolean);
+		const combinedSelector = selectorList.join(',');
+
+		// 保持するルート要素を特定（bodyの直接の子孫のみ）
+		const allMatches = Array.from(document.querySelectorAll(combinedSelector));
+		const rootKept: HTMLElement[] = [];
+
+		for (const el of allMatches) {
+			// 既に保持要素の子孫の場合はスキップ
+			const isDescendant = rootKept.some(kept => kept.contains(el as Node));
+			if (!isDescendant) {
+				// <article>要素を<main>にリネームして、defuddleがネストした<article>で混乱しないようにする
+				if (el.tagName === 'ARTICLE') {
+					const mainEl = document.createElement('main');
+					mainEl.innerHTML = el.innerHTML;
+					for (const attr of el.attributes) {
+						mainEl.setAttribute(attr.name, attr.value);
+					}
+					el.replaceWith(mainEl);
+					rootKept.push(mainEl);
+				} else {
+					rootKept.push(el as HTMLElement);
+				}
+			}
+		}
+
+		if (rootKept.length === 0) return html;
+
+		// body の子要素のうち、保持リストに含まれないものを削除（インプレース）
+		const bodyChildren = Array.from(document.body.children);
+		for (const child of bodyChildren) {
+			const isKept = rootKept.some(kept => kept === child || kept.contains(child));
+			if (!isKept) {
+				child.remove();
+			}
+		}
+
+		return document.body.innerHTML;
+	} catch (error) {
+		console.error('keepElementsBySelectors: failed', error);
 		return html;
 	}
 }

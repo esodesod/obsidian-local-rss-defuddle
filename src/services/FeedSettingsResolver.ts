@@ -12,12 +12,14 @@ export class FeedSettingsResolver {
 			autoDeleteTimeUnit: feed.customAutoDeleteTimeUnit ?? globalSettings.autoDeleteTimeUnit,
 			autoDeleteBasedOn: feed.customAutoDeleteBasedOn ?? globalSettings.autoDeleteBasedOn,
 			removeSelectors: feed.removeSelectors ?? '',
+			targetSelectors: feed.targetSelectors ?? globalSettings.targetSelectors ?? '',
 		};
 	}
 
 	static hasCustomSettings(feed: Feed): boolean {
 		return feed.customTemplate !== undefined
 			|| feed.customAutoDeleteEnabled !== undefined
-			|| feed.removeSelectors !== undefined;
+			|| feed.removeSelectors !== undefined
+			|| feed.targetSelectors !== undefined;
 	}
 }

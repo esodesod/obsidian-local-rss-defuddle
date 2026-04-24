@@ -48,12 +48,13 @@ export class ArticleRenderer {
 	 * @param rssItem RSSアイテム
 	 * @param template テンプレート文字列
 	 * @param processedContent 処理済みのHTMLコンテンツ
+	 * @param targetSelector defuddleに渡すCSSセレクタ（指定時は自動検出をバイパス）
 	 * @returns Markdownファイルの内容
 	 */
-	async render(rssItem: RssItem, template: string, processedContent: string): Promise<string> {
+	async render(rssItem: RssItem, template: string, processedContent: string, targetSelector?: string): Promise<string> {
 		const preparedTemplate = prepareTemplate(template, rssItem);
 		const templateData = this.buildTemplateData(rssItem);
-		templateData.content = await htmlToMarkdown(processedContent);
+		templateData.content = await htmlToMarkdown(processedContent, targetSelector);
 		return renderTemplate(preparedTemplate, templateData);
 	}
 }

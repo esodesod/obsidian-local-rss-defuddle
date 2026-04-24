@@ -48,6 +48,10 @@ export default {
 	removeSelectorsDesc:
 		'Sélecteurs CSS séparés par des virgules à supprimer du HTML de l\'article avant le parsing (ex: .lp_related,.authors,.ad-banner)',
 	removeSelectorsPlaceholder: '.ads,.sidebar,.related',
+	targetSelectors: 'Cibler des éléments par sélecteur CSS',
+	targetSelectorsDesc:
+		'Sélecteurs CSS séparés par des virgules à conserver dans le HTML de l\'article avant le parsing — tous les autres éléments seront supprimés (ex: #main,.article-body)',
+	targetSelectorsPlaceholder: '#main,.article-content',
 	imageWidth: 'Largeur des images',
 	imageWidthDesc: 'Largeur des images dans le contenu (ex: 50%, 300px)',
 	autoDeleteOldArticles: 'Supprimer automatiquement les anciens articles',
